@@ -3,14 +3,11 @@ import java.text.SimpleDateFormat;
 import java.util.Calendar;
 import java.util.Date;
 
-class KittyCal {
+class KittyCal extends UIObj {
   Date date;
   SimpleDateFormat sdf;
   Calendar cal;
-  PGraphics pg;
-  PGraphics pg_mask;
-  color transparentColor;
-  
+
   int cal_cols=7;
   int cal_rows=6;
   int cell_w = 20, cell_h = 20;
@@ -28,10 +25,10 @@ class KittyCal {
   int _month;
   int _year;
 
-  KittyCal(PGraphics _pg, color _transparentColor, int _x, int _y) {
+  KittyCal(PGraphics _pg, int _x, int _y) {
+    super (_pg);
     x = _x;
     y = _y;
-    transparentColor = _transparentColor;
     grid=new Cell[cal_cols][cal_rows];
     for (int i=0; i<cal_cols; i++) {
       for (int j=0; j<cal_rows; j++) {
@@ -45,7 +42,7 @@ class KittyCal {
     _year=2016;
     sdf = new SimpleDateFormat("M/d/y");
     date_=(nf(_month, 2, 0)+"/"+nf(_date, 2, 0)+"/"+_year);
-    println((nf(_month, 2, 0)+"/"+nf(_date, 2, 0)+"/"+_year));
+    //println((nf(_month, 2, 0)+"/"+nf(_date, 2, 0)+"/"+_year));
     cal.set(_month, _date, _year);
     try {
       date = sdf.parse(date_);
@@ -58,7 +55,7 @@ class KittyCal {
     gridDays=new Cell[cal_cols][cal_rows];
     for (_date=1; _date<=cal.getActualMaximum(Calendar.DAY_OF_MONTH); _date++) {
       date_=(nf(_month, 2, 0)+"/"+nf(_date, 2, 0)+"/"+_year);
-      println((nf(_month, 2, 0)+"/"+nf(_date, 2, 0)+"/"+_year));
+      //println((nf(_month, 2, 0)+"/"+nf(_date, 2, 0)+"/"+_year));
       cal.set(_month, _date, _year);
       try {
         date = sdf.parse(date_);
@@ -72,27 +69,26 @@ class KittyCal {
       j=cal.get(Calendar.WEEK_OF_MONTH);
       int i = ((day - 1) + 7) % 7;
       i = i == 0 ? 7 : i;
-      println("day = " + day + " i = "+i+" j= "+j);
+      //println("day = " + day + " i = "+i+" j= "+j);
       gridDays[i-1][j-1]=new Cell(x +(i-1)*cell_w, y+(j-1)*cell_h, cell_w, cell_w);
     }
 
     //println("Day Of Week: " + cal.get(Calendar.DAY_OF_WEEK));
     //println("Day Of Month: " + cal.get(Calendar.DAY_OF_MONTH));
     //println("Week Of Month: " + cal.get(Calendar.WEEK_OF_MONTH));
-    //println("Days Of Month: " + cal.getActualMaximum(Calendar.DAY_OF_MONTH));
-    pg = _pg;
-    pg_mask = createGraphics (pg.width, pg.height);
   }
 
-  void draw() {
+  void updateMask () {
     pg_mask.beginDraw();
-    pg_mask.background(0);
-    pg_mask.fill(255);
+    pg_mask.background(transparentColor);
+    pg_mask.fill(opaqueColor);
     pg_mask.rect(x, y, w, h);
     pg_mask.endDraw();
-    
+  }
+
+  void initial_display () {
     pg.beginDraw();
-    pg.background(transparentColor, 0);
+    pg.background(transparentColor);
     for (int i=0; i<cal_cols; i++) {
       for (int j=0; j<cal_rows; j++) {
         grid[i][j].display();
@@ -119,8 +115,7 @@ class KittyCal {
       gridDays[i-1][j-1].displayDays(cal.get(Calendar.DAY_OF_MONTH), day == 1);
     }
     pg.endDraw();
-    pg.mask (pg_mask);
-  }//end of draw
+  }
 
   class Cell {
     // A cell object knows about its location in the grid as well as its size with the variables x,y,w,h.
@@ -148,4 +143,10 @@ class KittyCal {
       pg.fill(255);
     }//end of display
   }//end Class Cell
+
+  void action_OnClick (int _mButton) {
+    if (_mButton == RIGHT) {
+      cal_menu.showMenu (mouseX, mouseY);
+    }
+  }
 }
