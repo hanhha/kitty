@@ -1,4 +1,4 @@
-class ContextMenu extends UIObj {
+class IContextMenu {
   String[] options;
   float diam, textdiam;
   int w, h;
@@ -111,6 +111,30 @@ class ContextMenu extends UIObj {
         println(options[selected] + " (option " + selected + ") selected.");
         //println(mouseButton);
       }
+    }
+  }
+
+    void MouseLeft () {
+
+    }
+  class CtxMenuAction extends IWorker {
+    void action (int action_id) {
+      switch (action_id) {
+        case 1 : do_selected_action ();
+                 hide_all ();
+                 break;
+        case 2 : break; // do nothing for RIGH CLICK
+        case 3 : update_appearance ();
+        default: break; // do nothing
+      }
+    }
+
+    void do_selected_action () {
+      // FIXME: figure out which item are selected and do corresponding action
+    }
+
+    void update_appearance () {
+      // FIXME: check if 
     }
   }
 }
